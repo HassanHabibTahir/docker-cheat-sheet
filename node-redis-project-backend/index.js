@@ -11,7 +11,6 @@ app.use(express.urlencoded({ extended: true }));
 // Redis client setup
 const redisClient = createClient({
   url: 'redis://redis:6379',
-  // url: 'rediss://default:AUo5AAIncDJlOTVlZmI3OTgwNDk0M2Q1OGI4YjUwMTc0ZjhkMDExMnAyMTkwMDE@suitable-impala-19001.upstash.io:6379',
 });
 redisClient.on('error', (err) => console.error('Redis Client Error:', err));
 
