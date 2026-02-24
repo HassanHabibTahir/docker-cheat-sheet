@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: .
+    container_name: node-backend
+    ports:
+      - '${PORT}:${PORT}'
+    depends_on:
+      - redis
+    env_file:
+      - .env
+
+  redis:
+    image: redis:latest
+    container_name: redis-db
+    ports:
+      - '${REDIS_PORT}:${REDIS_PORT}'
