@@ -1,0 +1,31 @@
+# ============================================
+# Git Ignore File
+# ============================================
+# Files and directories that should NOT be committed to git
+# ============================================
+
+# Environment variables (contains sensitive data like passwords)
+.env
+.env.local
+.env.*.local
+
+# Node.js dependencies (installed inside containers)
+node_modules/
+npm-debug.log*
+
+# Logs
+logs/
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker volumes (if accidentally created locally)
+postgres_data/

@@ -1,0 +1,110 @@
+# ============================================
+# Docker Compose for Node.js + PostgreSQL
+# ============================================
+# 
+# Environment Variables:
+# - This file can use variables from .env file
+# - ${VAR:-default} syntax means: use VAR from .env, or "default" if not set
+# - Docker Compose automatically loads .env file in same directory
+#
+# Services:
+#   1. db   - PostgreSQL database (shared)
+#   2. app1 - Node.js API (port 3001)
+#   3. app2 - Node.js API (port 3002)
+# ============================================
+
+version: '3.8'
+
+services:
+  # ----------------------------------------
+  # PostgreSQL Database Service
+  # ----------------------------------------
+  db:
+    image: postgres:15-alpine
+    container_name: postgres_db
+    restart: always
+    environment:
+      # These env vars are READ by the PostgreSQL container
+      # PostgreSQL uses them to create the initial user and database
+      POSTGRES_USER: ${DB_USER:-myuser}           # Username for PostgreSQL
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-mypassword}  # Password for PostgreSQL
+      POSTGRES_DB: ${DB_NAME:-mydatabase}         # Database name to create
+    ports:
+      # Expose PostgreSQL on host port (from .env or default 5432)
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      # Persist data even when container restarts
+      - postgres_data:/var/lib/postgresql/data
+      # Run SQL script on first startup to create tables
+      # The init.sql runs automatically when PostgreSQL starts first time
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mynetwork
+    healthcheck:
+      # Check if PostgreSQL is ready to accept connections
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-myuser} -d ${DB_NAME:-mydatabase}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------
+  # Node.js App 1 (runs on port 3001)
+  # ----------------------------------------
+  app1:
+    build: ./app1
+    container_name: node_app1
+    restart: always
+    ports:
+      - "${APP1_PORT:-3001}:3000"
+    environment:
+      # These env vars are PASSED to the Node.js app
+      # The app reads them via: process.env.DB_HOST, etc.
+      DB_HOST: db                                  # 'db' is the service name (Docker DNS)
+      DB_PORT: ${DB_PORT:-5432}                   # PostgreSQL port
+      DB_USER: ${DB_USER:-myuser}                 # Database username
+      DB_PASSWORD: ${DB_PASSWORD:-mypassword}     # Database password
+      DB_NAME: ${DB_NAME:-mydatabase}             # Database name
+      APP_NAME: "App 1"                           # To identify which app is responding
+    depends_on:
+      db:
+        condition: service_healthy  # Wait for PostgreSQL to be ready
+    networks:
+      - mynetwork
+
+  # ----------------------------------------
+  # Node.js App 2 (runs on port 3002)
+  # ----------------------------------------
+  # This app uses the SAME database as app1!
+  app2:
+    build: ./app2
+    container_name: node_app2
+    restart: always
+    ports:
+      - "${APP2_PORT:-3002}:3000"
+    environment:
+      # Same database connection as app1
+      DB_HOST: db
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-myuser}
+      DB_PASSWORD: ${DB_PASSWORD:-mypassword}
+      DB_NAME: ${DB_NAME:-mydatabase}
+      APP_NAME: "App 2"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - mynetwork
+
+# ----------------------------------------
+# Named volumes for data persistence
+# ----------------------------------------
+volumes:
+  postgres_data:
+    driver: local
+
+# ----------------------------------------
+# Custom network for service communication
+# ----------------------------------------
+networks:
+  mynetwork:
+    driver: bridge
