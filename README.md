@@ -1,6 +1,6 @@
 # Learn Docker with Projects
 
-## Useful Resources
+## Projects
 - [Static Website Hosting with Nginx and Docker](https://github.com/HassanHabibTahir/docker-cheat-sheet)
 - [Multi-Container Docker Applications](https://github.com/HassanHabibTahir/docker-cheat-sheet/tree/multi-container-docker-applications-with-docker-compose)
 - [one-database-shared-by-multiple-containers](https://github.com/HassanHabibTahir/docker-cheat-sheet/tree/one-database-shared-by-multiple-containers  )
