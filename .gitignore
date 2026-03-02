@@ -13,6 +13,7 @@ yarn-error.log*
 
 # Logs
 logs/
+temp_auto_push.bat
 *.log
 
 # Runtime data
@@ -28,4 +29,5 @@ node-redis-project-backend/
 # Misc
 .DS_Store
 Thumbs.db
-database-shared-by-multiple-containers/
+database-shared-by-multiple-containers/.gitignore
+temp_interactive_push.bat
