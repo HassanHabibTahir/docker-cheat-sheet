@@ -28,3 +28,4 @@ node-redis-project-backend/
 # Misc
 .DS_Store
 Thumbs.db
+database-shared-by-multiple-containers/
